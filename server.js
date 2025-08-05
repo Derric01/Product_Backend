@@ -23,11 +23,22 @@ app.use(express.json()); // allows us to accept JSON data in the req.body
 
 app.use("/api/products", productRoutes);
 
+// Health check endpoint
+app.get("/", (req, res) => {
+    res.json({ message: "API is working! 🚀" });
+});
+
+// Only serve static files if frontend directory exists (for monorepo deployments)
 if (process.env.NODE_ENV === "production") {
-    app.use(express.static(path.join(__dirname, "/frontend/dist")));
-    app.get("*", (req, res) => {
-        res.sendFile(path.resolve(__dirname, "frontend", "dist", "index.html"));
-    });
+    const frontendPath = path.join(__dirname, "/frontend/dist");
+    const fs = await import('fs');
+    
+    if (fs.existsSync(frontendPath)) {
+        app.use(express.static(frontendPath));
+        app.get("*", (req, res) => {
+            res.sendFile(path.resolve(__dirname, "frontend", "dist", "index.html"));
+        });
+    }
 }
 
 app.listen(PORT, () => {
