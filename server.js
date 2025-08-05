@@ -2,6 +2,7 @@ import express from "express";
 import dotenv from "dotenv";
 import path from "path";
 import cors from "cors";
+import fs from "fs";
 
 import { connectDB } from "./config/db.js";
 
@@ -31,7 +32,6 @@ app.get("/", (req, res) => {
 // Only serve static files if frontend directory exists (for monorepo deployments)
 if (process.env.NODE_ENV === "production") {
     const frontendPath = path.join(__dirname, "/frontend/dist");
-    const fs = await import('fs');
     
     if (fs.existsSync(frontendPath)) {
         app.use(express.static(frontendPath));
